@@ -38,8 +38,8 @@ public class OAuth2AuthorizationServerConfig3 extends AuthorizationServerConfigu
                /*1*/.authorizedGrantTypes("password", "authorization_code", "refresh_token" )
                /*2*/.scopes("foo", "read", "write")
                .accessTokenValiditySeconds(30) // 30 seconds, so that it expires quickly
-               /*3*/.refreshTokenValiditySeconds(2592000) // 30 days
-               ;
+               /*3*/.refreshTokenValiditySeconds(2592000); // 30 days
+
     } // @formatter:on
 
     @Override
@@ -48,8 +48,8 @@ public class OAuth2AuthorizationServerConfig3 extends AuthorizationServerConfigu
           tokenStore(tokenStore())
           .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)
           .accessTokenConverter(accessTokenConverter())
-          .authenticationManager(authenticationManager)
-          ;
+          .authenticationManager(authenticationManager);
+
     } // @formatter:on
 
     // JWT
