@@ -12,3 +12,18 @@
 hs_err_pid*
 
 target/
+/spring-security-oauth-resource/.classpath
+/spring-security-oauth-resource/.project
+/spring-security-oauth-server/.classpath
+.idea/
+spring-security-oauth-resource/spring-security-oauth-resource.iml
+spring-security-oauth-server/spring-security-oauth-server.iml
+spring-security-oauth-ui-implicit/spring-security-oauth-ui-implicit.iml
+spring-security-oauth-ui-password/spring-security-oauth-ui-password.iml
+spring-security-oauth.iml
+/spring-security-oauth-ui-implicit/.classpath
+/spring-security-oauth-ui-implicit/.project
+/spring-security-oauth-ui-password/.classpath
+/spring-security-oauth-ui-password/.project
+spring-security-oauth-ui-implicit.iml
+spring-security-oauth-ui-password.iml
