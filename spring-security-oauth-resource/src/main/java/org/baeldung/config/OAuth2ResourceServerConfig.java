@@ -25,12 +25,6 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 @PropertySource({ "classpath:persistence.properties" })
 @EnableResourceServer
 public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter {
-
-    @Autowired
-    private Environment env;
-
-    //
-
     @Override
     public void configure(final HttpSecurity http) throws Exception {
         // @formatter:off
@@ -61,7 +55,6 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        // converter.setSigningKey("123");
         final Resource resource = new ClassPathResource("public.txt");
         String publicKey = null;
         try {
@@ -80,23 +73,4 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
         defaultTokenServices.setTokenStore(tokenStore());
         return defaultTokenServices;
     }
-
-    // JDBC token store configuration
-
-    /*
-    @Bean
-    public DataSource dataSource() {
-        final DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
-        dataSource.setUrl(env.getProperty("jdbc.url"));
-        dataSource.setUsername(env.getProperty("jdbc.user"));
-        dataSource.setPassword(env.getProperty("jdbc.pass"));
-        return dataSource;
-    }
-
-    @Bean
-    public TokenStore tokenStore() {
-        return new JdbcTokenStore(dataSource());
-    }
-    */
 }
