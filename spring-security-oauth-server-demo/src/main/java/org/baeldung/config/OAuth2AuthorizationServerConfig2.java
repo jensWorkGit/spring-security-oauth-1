@@ -37,8 +37,7 @@ public class OAuth2AuthorizationServerConfig2 extends AuthorizationServerConfigu
                .secret("secret")
                .authorizedGrantTypes("password", "authorization_code" )
                .scopes("foo", "read", "write")
-               .accessTokenValiditySeconds(3600) // 1 hour
-               ;
+               .accessTokenValiditySeconds(3600); // 1 hour
     } // @formatter:on
 
     @Override
@@ -47,8 +46,7 @@ public class OAuth2AuthorizationServerConfig2 extends AuthorizationServerConfigu
           tokenStore(tokenStore())
           .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST)
           .accessTokenConverter(accessTokenConverter())
-          .authenticationManager(authenticationManager)
-          ;
+          .authenticationManager(authenticationManager);
     } // @formatter:on
 
     // JWT

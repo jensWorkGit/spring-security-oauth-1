@@ -35,8 +35,7 @@ public class OAuth2AuthorizationServerConfig1 extends AuthorizationServerConfigu
                .secret("secret")
                .authorizedGrantTypes("password", "authorization_code")
                .scopes("foo", "read", "write")
-               .accessTokenValiditySeconds(3600) // 1 hour
-               ;
+               .accessTokenValiditySeconds(3600); // 1 hour
     } // @formatter:on
 
     @Override
