@@ -1,6 +1,5 @@
 package org.baeldung.config;
 
-import java.security.KeyPair;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -37,9 +35,6 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     private Environment env;
 
     @Autowired
-    private ResourceLoader resourceLoader;
-
-    @Autowired
     @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
 
@@ -55,56 +50,45 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
 
     @Override
     public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {// @formatter:off
-        clients
-               //.jdbc(dataSource())
-               .inMemory()
-               .withClient("sampleClientId")
-               .authorizedGrantTypes("implicit")
-               .scopes("read","write","foo","bar")
-               .autoApprove(false)
-               .accessTokenValiditySeconds(3600)
+		clients
+				// .jdbc(dataSource())
+				.inMemory().withClient("sampleClientId").authorizedGrantTypes("implicit")
+				.scopes("read", "write", "foo", "bar").autoApprove(false).accessTokenValiditySeconds(3600)
 
-               .and()
-               .withClient("fooClientIdPassword")
-               .secret("secret")
-               .authorizedGrantTypes("password","authorization_code", "refresh_token")
-               .scopes("foo","read","write")
-               .accessTokenValiditySeconds(3600) // 1 hour
-               .refreshTokenValiditySeconds(2592000) // 30 days
+				.and().withClient("fooClientIdPassword").secret("secret")
+				.authorizedGrantTypes("password", "authorization_code", "refresh_token").scopes("foo", "read", "write")
+				.accessTokenValiditySeconds(3600) // 1 hour
+				.refreshTokenValiditySeconds(2592000) // 30 days
 
-               .and()
-               .withClient("barClientIdPassword")
-               .secret("secret")
-               .authorizedGrantTypes("password","authorization_code", "refresh_token")
-               .scopes("bar","read","write")
-               .accessTokenValiditySeconds(3600) // 1 hour
-               .refreshTokenValiditySeconds(2592000) // 30 days
-               ;
-    } // @formatter:on
+				.and().withClient("barClientIdPassword").secret("secret")
+				.authorizedGrantTypes("password", "authorization_code", "refresh_token").scopes("bar", "read", "write")
+				.accessTokenValiditySeconds(3600) // 1 hour
+				.refreshTokenValiditySeconds(2592000) // 30 days
+		;
+	} // @formatter:on
 
     @Override
     public void configure(final AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         // @formatter:off
-        final TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-        tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), jwtAccessTokenConverter()));
-        endpoints.tokenStore(tokenStore())
-                 //.accessTokenConverter(accessTokenConverter())
-                 .tokenEnhancer(tokenEnhancerChain)
-                 .authenticationManager(authenticationManager);
-        // @formatter:on
+		final TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+		tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), accessTokenConverter()));
+		endpoints.tokenStore(tokenStore())
+				// .accessTokenConverter(accessTokenConverter())
+				.tokenEnhancer(tokenEnhancerChain).authenticationManager(authenticationManager);
+		// @formatter:on
     }
 
     @Bean
     public TokenStore tokenStore() {
-        return new JwtTokenStore(jwtAccessTokenConverter());
+        return new JwtTokenStore(accessTokenConverter());
     }
 
     @Bean
-    public JwtAccessTokenConverter jwtAccessTokenConverter() {
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        KeyPair keyPair = new KeyStoreKeyFactory(new ClassPathResource("keystore.jks"), "foobar".toCharArray())
-                .getKeyPair("test");
-        converter.setKeyPair(keyPair);
+    public JwtAccessTokenConverter accessTokenConverter() {
+        final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+        // converter.setSigningKey("123");
+        final KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new ClassPathResource("mytest.jks"), "mypass".toCharArray());
+        converter.setKeyPair(keyStoreKeyFactory.getKeyPair("mytest"));
         return converter;
     }
 
@@ -125,33 +109,25 @@ public class OAuth2AuthorizationServerConfig extends AuthorizationServerConfigur
     // JDBC token store configuration
 
     /*
-        @Bean
-        public DataSourceInitializer dataSourceInitializer(final DataSource dataSource) {
-            final DataSourceInitializer initializer = new DataSourceInitializer();
-            initializer.setDataSource(dataSource);
-            initializer.setDatabasePopulator(databasePopulator());
-            return initializer;
-        }
-
-        private DatabasePopulator databasePopulator() {
-            final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-            populator.addScript(schemaScript);
-            return populator;
-        }
-
-        @Bean
-        public DataSource dataSource() {
-            final DriverManagerDataSource dataSource = new DriverManagerDataSource();
-            dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
-            dataSource.setUrl(env.getProperty("jdbc.url"));
-            dataSource.setUsername(env.getProperty("jdbc.user"));
-            dataSource.setPassword(env.getProperty("jdbc.pass"));
-            return dataSource;
-        }
-
-        @Bean
-        public TokenStore tokenStore() {
-            return new JdbcTokenStore(dataSource());
-        }
-    */
+     * @Bean public DataSourceInitializer dataSourceInitializer(final DataSource
+     * dataSource) { final DataSourceInitializer initializer = new
+     * DataSourceInitializer(); initializer.setDataSource(dataSource);
+     * initializer.setDatabasePopulator(databasePopulator()); return
+     * initializer; }
+     * 
+     * private DatabasePopulator databasePopulator() { final
+     * ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+     * populator.addScript(schemaScript); return populator; }
+     * 
+     * @Bean public DataSource dataSource() { final DriverManagerDataSource
+     * dataSource = new DriverManagerDataSource();
+     * dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
+     * dataSource.setUrl(env.getProperty("jdbc.url"));
+     * dataSource.setUsername(env.getProperty("jdbc.user"));
+     * dataSource.setPassword(env.getProperty("jdbc.pass")); return dataSource;
+     * }
+     * 
+     * @Bean public TokenStore tokenStore() { return new
+     * JdbcTokenStore(dataSource()); }
+     */
 }

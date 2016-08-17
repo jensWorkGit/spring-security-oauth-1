@@ -25,12 +25,46 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 @PropertySource({ "classpath:persistence.properties" })
 @EnableResourceServer
 public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter {
+
+    @Autowired
+    private Environment env;
+
+    //
+
     @Override
     public void configure(final HttpSecurity http) throws Exception {
-        http
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            .and().authorizeRequests().anyRequest().authenticated();
+        // @formatter:off
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).and().authorizeRequests()
+				.anyRequest().authenticated();
+		// .requestMatchers().antMatchers("/foos/**","/bars/**")
+		// .and()
+		// .authorizeRequests()
+		// .antMatchers(HttpMethod.GET,"/foos/**").access("#oauth2.hasScope('foo')
+		// and #oauth2.hasScope('read')")
+		// .antMatchers(HttpMethod.POST,"/foos/**").access("#oauth2.hasScope('foo')
+		// and #oauth2.hasScope('write')")
+		// .antMatchers(HttpMethod.GET,"/bars/**").access("#oauth2.hasScope('bar')
+		// and #oauth2.hasScope('read')")
+		// .antMatchers(HttpMethod.POST,"/bars/**").access("#oauth2.hasScope('bar')
+		// and #oauth2.hasScope('write') and hasRole('ROLE_ADMIN')")
+		;
+		// @formatter:on
     }
+
+    // Remote token service
+    /*
+    @Primary
+    @Bean
+    public RemoteTokenServices tokenService() {
+        final RemoteTokenServices tokenService = new RemoteTokenServices();
+        tokenService.setCheckTokenEndpointUrl("http://localhost:8081/spring-security-oauth-server/oauth/check_token");
+        tokenService.setClientId("fooClientIdPassword");
+        tokenService.setClientSecret("secret");
+        return tokenService;
+    }
+    */
+
+    // JWT token store
 
     @Override
     public void configure(final ResourceServerSecurityConfigurer config) {
@@ -45,6 +79,7 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+        // converter.setSigningKey("123");
         final Resource resource = new ClassPathResource("public.txt");
         String publicKey = null;
         try {
@@ -63,4 +98,19 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
         defaultTokenServices.setTokenStore(tokenStore());
         return defaultTokenServices;
     }
+
+    // JDBC token store configuration
+
+    /*
+     * @Bean public DataSource dataSource() { final DriverManagerDataSource
+     * dataSource = new DriverManagerDataSource();
+     * dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
+     * dataSource.setUrl(env.getProperty("jdbc.url"));
+     * dataSource.setUsername(env.getProperty("jdbc.user"));
+     * dataSource.setPassword(env.getProperty("jdbc.pass")); return dataSource;
+     * }
+     *
+     * @Bean public TokenStore tokenStore() { return new
+     * JdbcTokenStore(dataSource()); }
+     */
 }
